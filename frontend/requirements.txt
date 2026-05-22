@@ -1,0 +1,5 @@
+# Python dependencies for the Streamlit frontend.
+# Add Streamlit and any frontend-specific libraries here.
+streamlit
+plotly
+requests

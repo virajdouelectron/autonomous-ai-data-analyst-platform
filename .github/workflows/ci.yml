@@ -1,0 +1,2 @@
+# GitHub Actions workflow scaffold for CI on the AI Data Analyst platform.
+# This workflow should install dependencies, run linting, and execute tests for frontend and backend.
