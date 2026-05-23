@@ -3,13 +3,17 @@ from typing import List, Dict
 from fastapi import FastAPI
 
 from routes.insight import router as insight_router
+from routes.query import router as query_router
+from routes.ml import router as ml_router
 
 app = FastAPI(
     title="Autonomous AI Data Analyst Platform Backend",
-    description="Backend for generating business insights from dataframe statistics using Gemini API.",
+    description="Backend for generating business insights, data query and AutoML workflows.",
 )
 
 app.include_router(insight_router, prefix="/api")
+app.include_router(query_router, prefix="/api")
+app.include_router(ml_router, prefix="/api")
 
 
 @app.get("/health")

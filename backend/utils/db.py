@@ -17,10 +17,12 @@ object storage instead of as single MongoDB documents.
 
 from typing import List, Any
 import datetime
+from io import BytesIO
 
+import joblib
 import pandas as pd
+from bson import Binary, ObjectId
 from pymongo import MongoClient
-from bson import ObjectId
 
 from backend import config
 
@@ -92,3 +94,34 @@ def save_insight(dataset_id: str, insights_text: str, metadata: dict | None = No
 	result = db.insights.insert_one(doc)
 	return str(result.inserted_id)
 
+
+def save_query_history(question: str, pandas_code: str, schema: dict | str | None = None, dataset_id: str | None = None) -> str:
+    """Save a query history record and return its id."""
+    db = get_db()
+    doc = {
+        "dataset_id": dataset_id,
+        "question": question,
+        "pandas_code": pandas_code,
+        "schema": schema,
+        "created_at": datetime.datetime.utcnow(),
+    }
+    result = db.query_history.insert_one(doc)
+    return str(result.inserted_id)
+
+
+def save_model(dataset_id: str, model_name: str, metrics: dict, model_binary: Any) -> str:
+    """Serialize a scikit-learn model to bytes and persist it in MongoDB."""
+    db = get_db()
+    buffer = BytesIO()
+    joblib.dump(model_binary, buffer)
+    buffer.seek(0)
+
+    doc = {
+        "dataset_id": dataset_id,
+        "model_name": model_name,
+        "metrics": metrics,
+        "model_blob": Binary(buffer.read()),
+        "created_at": datetime.datetime.utcnow(),
+    }
+    result = db.ml_models.insert_one(doc)
+    return str(result.inserted_id)

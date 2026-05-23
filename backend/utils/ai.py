@@ -21,6 +21,48 @@ def build_insight_prompt(statistics: dict) -> str:
     )
 
 
+def build_pandas_query_prompt(question: str, schema: dict) -> str:
+    """Build a Gemini prompt that asks for valid pandas code using the provided schema."""
+    if isinstance(schema, dict):
+        schema_lines = [f"{column}: {dtype}" for column, dtype in schema.items()]
+    else:
+        schema_lines = [str(schema)]
+
+    schema_block = "\n".join(schema_lines)
+
+    return (
+        "You are a helpful Python data analyst. Given a pandas DataFrame named `df` and the column schema below, "
+        "generate only valid pandas code that answers the user's natural language question.\n\n"
+        f"Column schema:\n{schema_block}\n\n"
+        f"User question:\n{question}\n\n"
+        "Requirements:\n"
+        "- Use `df` as the DataFrame variable.\n"
+        "- Return only executable pandas code, without markdown, backticks, explanation, or commentary.\n"
+        "- Do not include imports.\n"
+        "- If the answer is a scalar or series, assign it to `result` or use `df` operations.\n"
+        "- Use standard pandas methods and expressions.\n\n"
+        "Provide only the final Python code."
+    )
+
+
+def extract_code_from_gemini_response(text: str) -> str:
+    """Extract code from Gemini model output and strip formatting wrappers."""
+    import re
+
+    if not text:
+        return ""
+
+    code = text.strip()
+    match = re.search(r"```(?:python)?\s*(.*?)```", code, re.S)
+    if match:
+        code = match.group(1).strip()
+
+    if code.startswith("python\n"):
+        code = code[len("python\n") :].strip()
+
+    return code
+
+
 def call_gemini_api(prompt: str) -> str:
     """Send a prompt to the Gemini API and return the generated insights."""
     if not GEMINI_API_KEY:

@@ -1,5 +1,11 @@
 # Autonomous AI Data Analyst Platform
 
+---
+sdk: docker
+app_port: 8000
+pinned: false
+---
+
 ## Overview
 
 This repository contains an Autonomous AI Data Analyst Platform with a Streamlit frontend and FastAPI backend.

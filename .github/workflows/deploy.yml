@@ -1,2 +1,0 @@
-# GitHub Actions workflow scaffold for deployment of frontend and backend services.
-# This workflow should build Docker images, push to a registry, and deploy to the target environment.
