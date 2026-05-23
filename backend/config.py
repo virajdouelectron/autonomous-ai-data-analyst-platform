@@ -21,9 +21,9 @@ DEBUG = os.getenv("DEBUG", "false").lower() in ("1", "true", "yes")
 def validate_required_config():
 	missing = []
 	if not GEMINI_API_KEY:
-		missing.append("AIzaSyAFE4c7Bg6VGn90ido_WjVDwlOywFLoIeM")
+		missing.append("GEMINI_API_KEY")
 	if not MONGO_URI:
-		missing.append("mongodb+srv://virajsingh585_db_user:EUeQQ7Xb3mlA7waz@programming.8uizky1.mongodb.net/?appName=programming")
+		missing.append("MONGO_URI")
 	if missing:
 		raise RuntimeError(
 			"Missing required environment variables: {}. "
