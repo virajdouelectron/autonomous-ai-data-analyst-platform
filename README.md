@@ -1,49 +1,45 @@
-# Autonomous AI Data Analyst Platform
-
 ---
+title: AI Data Analyst Backend
+emoji: ⚙️
+colorFrom: green
+colorTo: yellow
 sdk: docker
 app_port: 8000
 pinned: false
 ---
 
-## Overview
+# ⚙️ AI Data Analyst Backend
 
-This repository contains an Autonomous AI Data Analyst Platform with a Streamlit frontend and FastAPI backend.
-The platform is designed to integrate Gemini API for AI insights, MongoDB Atlas for metadata management, Azure Blob Storage for datasets and model artifacts, and Scikit-learn for AutoML.
+This repository contains the FastAPI backend for the Autonomous AI Data Analyst Platform. The API handles CSV storage and retrieval, automated EDA, AI-driven insights via the Gemini API, natural-language-to-Pandas query translation, and simple AutoML model training using Scikit-learn.
 
-## Repository Structure
+## What the API does
+- Accepts and stores uploaded CSV datasets for later processing and retrieval.
+- Runs automated Exploratory Data Analysis (EDA) and returns summary statistics and visualizations.
+- Generates AI-driven insights and business summaries using the Gemini API.
+- Translates natural-language queries into Pandas operations and returns query results.
+- Trains AutoML models (classification/regression) with Scikit-learn and returns evaluation metrics and trained model artifacts.
 
-- `frontend/`
-  - Streamlit pages and reusable components for the UI.
-  - `frontend/Dockerfile` for building the frontend container.
-  - `frontend/requirements.txt` for frontend dependencies.
+## API Endpoints
 
-- `backend/`
-  - FastAPI application with route handlers and AI agents.
-  - Agents for EDA, AutoML, query handling, and insights.
-  - Utility modules for database, storage, and AI integration.
-  - `backend/Dockerfile` for building the backend container.
-  - `backend/requirements.txt` for backend dependencies.
+| Endpoint | Method | Description |
+|---|---:|---|
+| `/upload` | POST | Upload a CSV file; stores file and returns a dataset ID and metadata. |
+| `/insights` | POST | Request automated EDA and AI insights for a dataset ID; returns summaries, charts, and AI-generated findings. |
+| `/query` | POST | Send a natural-language question and dataset ID; returns translated Pandas result or a structured answer. |
+| `/train` | POST | Start AutoML training on a dataset ID and target column; returns training status, metrics, and model info. |
 
-- `.github/workflows/`
-  - CI/CD workflows for testing and deploying the platform.
+## Tech stack
+- **API framework:** FastAPI
+- **AI / LLM:** Gemini API
+- **Database / Storage:** MongoDB Atlas
+- **ML library:** Scikit-learn
+- **Deployment:** Docker
 
-- `.env.example`
-  - Example environment variables required to run the platform.
+## Environment variables
+- `MONGO_URI`: MongoDB connection string used to connect to MongoDB Atlas. The backend uses this to store dataset metadata, file references, model artifacts, and results.
+- `GEMINI_API_KEY`: API key (or credential) for accessing the Gemini API. The backend uses this key to request AI-generated insights and to translate NL queries.
 
-## Environment Variables
+Place the variables in your environment or in container secrets before starting the service.
 
-Environment variables should be defined in a `.env` file or your deployment environment.
-
-- `GEMINI_API_KEY`
-- `MONGO_URI`
-- `AZURE_STORAGE_CONN`
-- `BACKEND_URL`
-
-## Next Steps
-
-1. Implement Streamlit pages and frontend components.
-2. Add FastAPI route logic and agent workflows.
-3. Configure CI/CD workflows in GitHub Actions.
-4. Connect the backend to MongoDB Atlas and Azure Blob Storage.
-5. Integrate Gemini API calls and Scikit-learn AutoML.
+---
+Backend README for Hugging Face Space (docker SDK) configuration and API reference.
