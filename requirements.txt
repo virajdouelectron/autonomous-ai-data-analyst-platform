@@ -1,12 +1,11 @@
-# Root requirements for Hugging Face Spaces deployment.
-# This is an intelligent merge of backend and frontend dependencies.
-fastapi==0.112.0
-uvicorn[standard]==0.24.0
-pymongo==4.7.2
-scikit-learn==1.3.2
-pandas==2.2.3
-requests==2.31.0
-streamlit==1.26.0
-plotly==5.16.0
-python-dotenv==1.0.0
-joblib==1.3.2
+streamlit==1.35.0
+pandas
+numpy
+plotly
+matplotlib
+scikit-learn
+fastapi
+uvicorn
+pymongo
+google-generativeai
+python-dotenv
