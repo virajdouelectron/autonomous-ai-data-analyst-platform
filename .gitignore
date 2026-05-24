@@ -21,6 +21,9 @@ env/
 # VS Code
 .vscode/
 
+# Streamlit config
+.streamlit/
+
 # Jupyter
 .ipynb_checkpoints/
 

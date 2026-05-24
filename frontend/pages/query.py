@@ -4,8 +4,6 @@ import plotly.express as px
 import requests
 import streamlit as st
 
-st.set_page_config(page_title="Natural Language Query", page_icon="💬", layout="wide")
-
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
 
 if "chat_history" not in st.session_state:

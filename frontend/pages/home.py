@@ -4,12 +4,6 @@ import plotly.express as px
 import requests
 import streamlit as st
 
-st.set_page_config(
-    page_title="Data Analyst Dashboard",
-    page_icon="📊",
-    layout="wide",
-)
-
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
 
 st.title("Autonomous AI Data Analyst Platform")

@@ -1,0 +1,12 @@
+# Root requirements for Hugging Face Spaces deployment.
+# This is an intelligent merge of backend and frontend dependencies.
+fastapi
+uvicorn[standard]
+pymongo
+scikit-learn
+pandas
+requests
+streamlit
+plotly
+python-dotenv
+joblib
