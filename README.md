@@ -1,11 +1,14 @@
 ---
-title: AI Data Analyst Backend
-emoji: ⚙️
-colorFrom: green
-colorTo: yellow
-sdk: docker
-app_port: 8000
+---
+title: Autonomous AI Data Analyst
+emoji: 📊
+colorFrom: blue
+colorTo: indigo
+sdk: streamlit
+sdk_version: 1.35.0
+app_file: app.py
 pinned: false
+---
 ---
 
 # ⚙️ AI Data Analyst Backend
