@@ -45,6 +45,7 @@ async def upload_data(payload: List[Dict]):
     
     return {
         "received": len(cleaned_records),
+        "data": cleaned_records,
         "status": "success",
         "message": "CSV data uploaded and cleaned successfully"
     }

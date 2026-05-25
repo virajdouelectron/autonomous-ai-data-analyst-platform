@@ -21,6 +21,24 @@ def clean_dataframe_nan(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def _clean_list_nan(lst: List[Any]) -> List[Any]:
+    """Recursively replace NaN and inf values in a list with None."""
+    cleaned_lst = []
+    for v in lst:
+        if isinstance(v, float):
+            if np.isnan(v) or np.isinf(v):
+                cleaned_lst.append(None)
+            else:
+                cleaned_lst.append(v)
+        elif isinstance(v, dict):
+            cleaned_lst.append(clean_dict_nan(v))
+        elif isinstance(v, list):
+            cleaned_lst.append(_clean_list_nan(v))
+        else:
+            cleaned_lst.append(v)
+    return cleaned_lst
+
+
 def clean_dict_nan(data: Dict[str, Any]) -> Dict[str, Any]:
     """Replace NaN and inf values in dict with None for JSON serialization.
     
@@ -40,7 +58,7 @@ def clean_dict_nan(data: Dict[str, Any]) -> Dict[str, Any]:
         elif isinstance(value, dict):
             cleaned[key] = clean_dict_nan(value)
         elif isinstance(value, list):
-            cleaned[key] = [None if (isinstance(v, float) and (np.isnan(v) or np.isinf(v))) else v for v in value]
+            cleaned[key] = _clean_list_nan(value)
         else:
             cleaned[key] = value
     return cleaned

@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Any
 
 from fastapi import APIRouter
 from pydantic import BaseModel
@@ -31,12 +31,12 @@ class DatasetQueryRequest(BaseModel):
 class DatasetQueryResponse(BaseModel):
     prompt: str
     pandas_code: str
-    result: dict | None
+    result: list[dict] | dict | int | float | str | bool | None
     error: str | None = None
 
 
 # ISSUE 3 FIX: Convert query results to JSON-serializable format using utility functions
-def make_result_json_serializable(result: any) -> dict | None:
+def make_result_json_serializable(result: Any) -> list[dict] | dict | int | float | str | bool | None:
     """Convert query results to JSON-serializable format, replacing NaN/inf with None."""
     if result is None:
         return None
@@ -55,6 +55,12 @@ def make_result_json_serializable(result: any) -> dict | None:
     if isinstance(result, dict):
         # Use utility function to clean dict values
         return clean_dict_nan(result)
+    
+    if isinstance(result, (int, float, str, bool)):
+        if isinstance(result, float):
+            import math
+            return result if math.isfinite(result) else None
+        return result
     
     return None
 

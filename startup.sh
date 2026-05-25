@@ -52,16 +52,46 @@ uvicorn app:app \
 FASTAPI_PID=$!
 echo "   FastAPI PID: $FASTAPI_PID"
 
-# Give FastAPI time to start
-sleep 3
+# Register trap immediately so it is active during health checks and streamlit run
+trap "kill $FASTAPI_PID 2>/dev/null || true" EXIT
 
-# Check if FastAPI started successfully
-if ! kill -0 $FASTAPI_PID 2>/dev/null; then
-    echo "❌ FastAPI failed to start"
+# Ensure curl is available
+if ! command -v curl &> /dev/null; then
+    echo "❌ curl is not installed. Exiting..."
     exit 1
 fi
 
-echo "✓ FastAPI started successfully"
+# Verify process is running
+if ! kill -0 $FASTAPI_PID 2>/dev/null; then
+    echo "❌ FastAPI process is not running."
+    exit 1
+fi
+
+# Poll HTTP health endpoint using curl
+echo "⏳ Waiting for FastAPI backend to become ready..."
+TIMEOUT=30
+ELAPSED=0
+SUCCESS=false
+
+while [ $ELAPSED -lt $TIMEOUT ]; do
+    if curl -s -f http://localhost:8000/health >/dev/null 2>&1; then
+        SUCCESS=true
+        break
+    fi
+    if ! kill -0 $FASTAPI_PID 2>/dev/null; then
+        echo "❌ FastAPI process died."
+        break
+    fi
+    sleep 1
+    ELAPSED=$((ELAPSED + 1))
+done
+
+if [ "$SUCCESS" = false ]; then
+    echo "❌ FastAPI health check failed. Terminating..."
+    exit 1
+fi
+
+echo "✓ FastAPI started successfully and is accepting HTTP connections"
 echo ""
 
 # Start Streamlit frontend on port 7860 in the foreground (main process)
@@ -72,6 +102,3 @@ streamlit run app.py \
     --server.address=0.0.0.0 \
     --logger.level=info \
     --client.toolbarMode=viewer
-
-# Cleanup on exit
-trap "kill $FASTAPI_PID 2>/dev/null || true" EXIT

@@ -135,7 +135,7 @@ HuggingFace will:
 
 ### Backend API Endpoints
 | Endpoint | Method | Description |
-|---|---:|---|
+|---|---|---|
 | `/health` | GET | Health check for monitoring |
 | `/upload` | POST | Upload CSV dataset; returns dataset ID |
 | `/api/insights` | POST | Generate AI insights from data statistics |

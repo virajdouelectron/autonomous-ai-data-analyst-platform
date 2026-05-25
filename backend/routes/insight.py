@@ -2,7 +2,6 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 
 import json
-import numpy as np
 import pandas as pd
 
 from agents.insight_agent import generate_business_insights
@@ -18,17 +17,6 @@ class InsightRequest(BaseModel):
 class InsightResponse(BaseModel):
     prompt: str
     insights: str
-
-
-# ISSUE 3 FIX: Helper function to make DataFrame JSON-serializable by replacing NaN/inf
-def clean_dataframe_json(df: pd.DataFrame) -> str:
-    """Convert DataFrame to JSON string, replacing NaN and inf values with None."""
-    df = df.copy()
-    # Replace inf and -inf with None
-    df = df.replace([np.inf, -np.inf], None)
-    # Replace NaN with None
-    df = df.where(pd.notnull(df), None)
-    return df.to_json()
 
 
 @router.post("/insights", response_model=InsightResponse)

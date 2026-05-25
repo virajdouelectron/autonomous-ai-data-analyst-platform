@@ -2,7 +2,7 @@
 # Runs both FastAPI backend and Streamlit frontend in a single container
 # HuggingFace Spaces required: port 7860 exposed for Streamlit
 
-FROM python:3.10-slim
+FROM python:3.11-slim
 
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -12,6 +12,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     gcc \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy dependency files
