@@ -24,7 +24,10 @@ import pandas as pd
 from bson import Binary, ObjectId
 from pymongo import MongoClient
 
-from backend import config
+try:
+    from backend import config
+except ImportError:
+    import config
 
 
 _client: MongoClient | None = None
