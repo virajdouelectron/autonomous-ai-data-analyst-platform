@@ -9,14 +9,20 @@ RUN apt-get update \
 	&& rm -rf /var/lib/apt/lists/*
 
 # Copy and install Python dependencies
-COPY backend/requirements.txt ./requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements.txt ./requirements.txt
+COPY backend/requirements.txt ./backend_requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt && \
+	pip install --no-cache-dir -r backend_requirements.txt
 
-# Copy backend source
+# Copy backend and frontend source
 COPY backend/ ./backend/
-WORKDIR /app/backend
+COPY frontend/ ./frontend/
+COPY app.py ./app.py
+COPY scripts/start.sh /app/start.sh
+RUN chmod +x /app/start.sh
 
-EXPOSE 8000
+EXPOSE 8000 7860
 
-# Start Uvicorn server (serves app from backend/app.py)
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+# ISSUE 2 FIX: Use startup script to run both FastAPI and Streamlit in the same container
+# This enables deployment on HuggingFace Spaces where both services need to run together
+CMD ["/app/start.sh"]

@@ -10,6 +10,7 @@ Do not add persistence here; this is a pure analysis utility.
 """
 from typing import Any, Dict
 
+import numpy as np
 import pandas as pd
 from pandas.api import types as pd_types
 
@@ -26,6 +27,8 @@ def compute_missing_value_analysis(df: pd.DataFrame) -> Dict[str, Dict[str, Any]
       - mean: mean value for numeric columns (or None)
 
     All values are JSON-serializable (numbers, strings, or None).
+    
+    ISSUE 3 FIX: Ensures min/max/mean values are JSON-serializable and handles NaN/inf properly.
     """
     results: Dict[str, Dict[str, Any]] = {}
     total_rows = len(df)
@@ -44,10 +47,19 @@ def compute_missing_value_analysis(df: pd.DataFrame) -> Dict[str, Dict[str, Any]
         if pd_types.is_numeric_dtype(series):
             try:
                 cleaned = pd.to_numeric(series.dropna())
+                # ISSUE 3 FIX: Replace inf values with None to ensure JSON serialization
+                cleaned = cleaned.replace([np.inf, -np.inf], None)
                 if not cleaned.empty:
                     col_min = float(cleaned.min())
                     col_max = float(cleaned.max())
                     col_mean = float(round(cleaned.mean(), 6))
+                    # ISSUE 3 FIX: Convert inf values to None for JSON compatibility
+                    if np.isinf(col_min):
+                        col_min = None
+                    if np.isinf(col_max):
+                        col_max = None
+                    if np.isnan(col_mean):
+                        col_mean = None
             except Exception:
                 # If conversion fails, leave stats as None
                 col_min = col_max = col_mean = None

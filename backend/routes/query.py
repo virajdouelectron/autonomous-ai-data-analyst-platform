@@ -3,8 +3,12 @@ from typing import Dict
 from fastapi import APIRouter
 from pydantic import BaseModel
 
+import numpy as np
+import pandas as pd
+
 from agents.query_agent import generate_pandas_code, query_dataset
 from utils.db import save_query_history
+from utils.json_utils import clean_dataframe_nan, clean_dict_nan
 
 router = APIRouter()
 
@@ -31,6 +35,30 @@ class DatasetQueryResponse(BaseModel):
     error: str | None = None
 
 
+# ISSUE 3 FIX: Convert query results to JSON-serializable format using utility functions
+def make_result_json_serializable(result: any) -> dict | None:
+    """Convert query results to JSON-serializable format, replacing NaN/inf with None."""
+    if result is None:
+        return None
+    
+    if isinstance(result, pd.DataFrame):
+        # Use utility function to clean NaN/inf values
+        df_clean = clean_dataframe_nan(result)
+        return df_clean.to_dict(orient="records")
+    
+    if isinstance(result, pd.Series):
+        # Clean NaN/inf values in Series
+        df = result.to_frame()
+        df_clean = clean_dataframe_nan(df)
+        return df_clean.to_dict(orient="records")
+    
+    if isinstance(result, dict):
+        # Use utility function to clean dict values
+        return clean_dict_nan(result)
+    
+    return None
+
+
 @router.post("/query", response_model=QueryResponse)
 def create_query_code(request: QueryRequest):
     """Generate valid pandas code for a user's natural language question."""
@@ -47,6 +75,11 @@ def create_query_code(request: QueryRequest):
 def create_dataset_query(request: DatasetQueryRequest):
     """Generate pandas code from a question and execute it against a dataset stored in MongoDB."""
     result = query_dataset(request.dataset_id, request.question)
+    
+    # ISSUE 3 FIX: Make result JSON-serializable by replacing NaN/inf with None
+    if result.get("result") is not None:
+        result["result"] = make_result_json_serializable(result["result"])
+    
     save_query_history(
         question=request.question,
         pandas_code=result["pandas_code"],

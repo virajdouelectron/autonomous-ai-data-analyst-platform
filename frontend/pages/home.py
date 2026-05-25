@@ -38,6 +38,18 @@ def missing_value_summary(df: pd.DataFrame) -> pd.DataFrame:
     )
 
 
+# ISSUE 3 FIX: Helper function to clean NaN values before sending to backend
+def clean_dataframe_for_json(df: pd.DataFrame) -> pd.DataFrame:
+    """Replace NaN and inf values with None for JSON serialization."""
+    import numpy as np
+    df = df.copy()
+    # Replace inf and -inf with None
+    df = df.replace([np.inf, -np.inf], None)
+    # Replace NaN with None
+    df = df.where(pd.notnull(df), None)
+    return df
+
+
 def create_auto_charts(df: pd.DataFrame, max_categories: int = 25, sample_size: int = 10000, bins: int = 30):
     """Automatically create Plotly charts based on column dtypes.
 
@@ -152,8 +164,10 @@ if uploaded_file is not None:
         if st.button("Upload CSV to backend"):
             with st.spinner("Uploading dataset to backend..."):
                 try:
+                    # ISSUE 3 FIX: Clean NaN and inf values before sending to backend
+                    cleaned_df = clean_dataframe_for_json(df)
                     # Convert DataFrame to list of records and POST as JSON
-                    records = df.to_dict(orient="records")
+                    records = cleaned_df.to_dict(orient="records")
                     resp = requests.post(f"{BACKEND_URL}/upload", json=records, timeout=60)
                     resp.raise_for_status()
                     st.success(f"Upload successful: {resp.json()}")
