@@ -36,7 +36,8 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 cp .env.example .env
 
 # Edit .env with your credentials
-# MONGO_URI=your_mongo_connection_string
+# SUPABASE_URL=your_supabase_project_url
+# SUPABASE_ANON_KEY=your_supabase_anon_key
 # GEMINI_API_KEY=your_gemini_key
 ```
 
@@ -76,7 +77,8 @@ docker build -t ai-analyst:latest .
 #### 2. Run Locally
 ```bash
 docker run -it \
-  -e MONGO_URI="your_mongo_uri" \
+   -e SUPABASE_URL="your_supabase_project_url" \
+   -e SUPABASE_ANON_KEY="your_supabase_anon_key" \
   -e GEMINI_API_KEY="your_gemini_key" \
   -e BACKEND_URL="http://localhost:8000" \
   -p 7860:7860 \
@@ -103,7 +105,8 @@ Access the app at `http://localhost:7860`
 In your Space Settings > Secrets, add:
 
 ```
-MONGO_URI = mongodb+srv://username:password@cluster.mongodb.net/db_name
+SUPABASE_URL = your supabase project URL
+SUPABASE_ANON_KEY = your supabase anon key
 GEMINI_API_KEY = your_gemini_api_key_here
 BACKEND_URL = http://localhost:8000
 ```
@@ -186,7 +189,8 @@ Autonomous-AI-Data-Analyst-Platform/
 ## 🔧 Environment Variables
 
 ### Required (HuggingFace Spaces Secrets)
-- `MONGO_URI` - MongoDB Atlas connection string
+- `SUPABASE_URL` - your supabase project URL
+- `SUPABASE_ANON_KEY` - your supabase anon key
 - `GEMINI_API_KEY` - Google Gemini API key
 
 ### Optional
@@ -205,7 +209,7 @@ cp .env.example .env
 
 - **Frontend**: Streamlit (Python web framework)
 - **Backend**: FastAPI (async Python API)
-- **Database**: MongoDB Atlas (cloud document DB)
+- **Database**: Supabase (cloud Postgres + storage)
 - **AI/LLM**: Google Gemini API (insights & query translation)
 - **ML**: Scikit-learn (AutoML model training)
 - **Deployment**: Docker + HuggingFace Spaces
@@ -219,7 +223,7 @@ cp .env.example .env
 ✅ **AI-Powered Insights** - Business summaries using Gemini API
 ✅ **Natural Language Queries** - Ask questions in plain English, get Pandas code
 ✅ **AutoML Training** - Automatic model selection, hyperparameter tuning
-✅ **Metadata Persistence** - Store datasets, insights, and models in MongoDB
+✅ **Metadata Persistence** - Store datasets, insights, and models in Supabase
 ✅ **Responsive UI** - Mobile-friendly Streamlit interface
 ✅ **Production Ready** - Environment-based config, health checks, error handling
 
@@ -248,7 +252,7 @@ cp .env.example .env
 - **Fix**: Check `BACKEND_URL` env var is set correctly (should be `http://localhost:8000` for HF Spaces)
 
 ### "Missing required environment variables" error
-- **Cause**: `MONGO_URI` or `GEMINI_API_KEY` not set
+- **Cause**: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, or `GEMINI_API_KEY` not set
 - **Fix**: Add them to HuggingFace Space Secrets or local `.env` file
 
 ### Docker build fails
