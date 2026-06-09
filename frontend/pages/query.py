@@ -113,7 +113,12 @@ with st.sidebar:
     st.write("2. Ask a question using the chat input")
     st.write("3. View the generated pandas code and result")
 
-uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"], help="Select a local CSV dataset for natural language querying.")
+uploaded_file = st.file_uploader(
+    "Upload CSV",
+    type=["csv"],
+    key="query_uploader_1",
+    help="Select a local CSV dataset for natural language querying.",
+)
 
 if uploaded_file is not None:
     try:
