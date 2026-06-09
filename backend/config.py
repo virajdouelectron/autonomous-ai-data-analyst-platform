@@ -7,12 +7,12 @@ example, injected as Hugging Face Spaces secrets at runtime).
 """
 
 # Secrets / connection strings (read from environment / secrets manager)
-MONGO_URI = os.getenv("MONGO_URI")
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_ANON_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
-if not MONGO_URI:
-	print("⚠️ WARNING: MONGO_URI not set. Database features will be disabled.")
-	MONGO_URI = None
+if not SUPABASE_URL or not SUPABASE_KEY:
+	print("⚠️ WARNING: SUPABASE_URL or SUPABASE_ANON_KEY not set. Database features will be disabled.")
 
 
 # Runtime configuration
