@@ -21,13 +21,18 @@ def get_client():
 	if _supabase is not None:
 		return _supabase
 
-	if not config.SUPABASE_URL or not config.SUPABASE_KEY:
+	# Read fresh from environment each time
+	import os
+	supabase_url = os.environ.get("SUPABASE_URL")
+	supabase_key = os.environ.get("SUPABASE_ANON_KEY")
+
+	if not supabase_url or not supabase_key:
 		if not _missing_supabase_warning_emitted:
-			print("WARNING: SUPABASE_URL or SUPABASE_KEY is not configured. Database features are disabled.")
+			print("WARNING: SUPABASE_URL or SUPABASE_ANON_KEY not set.")
 			_missing_supabase_warning_emitted = True
 		return None
 
-	_supabase = create_client(config.SUPABASE_URL, config.SUPABASE_KEY)
+	_supabase = create_client(supabase_url, supabase_key)
 	return _supabase
 
 

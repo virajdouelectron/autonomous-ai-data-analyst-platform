@@ -1,22 +1,20 @@
 import os
 
-"""Application configuration loaded from environment variables.
-
-These values are intended to be provided as environment variables (for
-example, injected as Hugging Face Spaces secrets at runtime).
-"""
-
-# Secrets / connection strings (read from environment / secrets manager)
-SUPABASE_URL = os.getenv("https://ifaqimxdpcbpfzviygaj.supabase.co")
-SUPABASE_KEY = os.getenv("sb_publishable_yJytuCM7_FA7lfvfWOlTFg_epTzkjQD")
-GEMINI_API_KEY = os.getenv("AIzaSyB5gT_CxP_Un3t1Cfh36pnYRM6oOvgtOac")
-
-if not SUPABASE_URL or not SUPABASE_KEY:
-	print("⚠️ WARNING: SUPABASE_URL or SUPABASE_ANON_KEY not set. Database features will be disabled.")
+def get_supabase_url():
+	return os.environ.get("https://ifaqimxdpcbpfzviygaj.supabase.co")
 
 
-# Runtime configuration
-BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
+def get_supabase_key():
+	return os.environ.get("sb_publishable_yJytuCM7_FA7lfvfWOlTFg_epTzkjQD")
 
-# Optional: allow toggling debug or other flags via env
-DEBUG = os.getenv("DEBUG", "false").lower() in ("1", "true", "yes")
+
+def get_gemini_key():
+	return os.environ.get("AIzaSyB5gT_CxP_Un3t1Cfh36pnYRM6oOvgtOac")
+
+
+BACKEND_URL = os.environ.get("http://localhost:8000")
+
+# Still expose as module-level for backwards compatibility
+SUPABASE_URL = os.environ.get("https://ifaqimxdpcbpfzviygaj.supabase.co")
+SUPABASE_ANON_KEY = os.environ.get("sb_publishable_yJytuCM7_FA7lfvfWOlTFg_epTzkjQD")
+GEMINI_API_KEY = os.environ.get("AIzaSyB5gT_CxP_Un3t1Cfh36pnYRM6oOvgtOac")
