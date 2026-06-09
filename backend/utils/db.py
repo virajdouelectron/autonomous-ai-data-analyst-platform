@@ -7,7 +7,7 @@ Provides two convenience functions used by the platform:
 - `get_dataset(dataset_id)` -> fetches the document by id and returns the rows as a
   `pandas.DataFrame`.
 
-This module uses the `MONGO_URI` value from `backend.config`. It keeps a lazily
+This module uses the `MONGO_URI` value from `config`. It keeps a lazily
 initialized `MongoClient` instance to be imported and used by API routes or agents.
 
 Note: This is a minimal implementation for scaffolding purposes. For production use,
@@ -24,10 +24,7 @@ import pandas as pd
 from bson import Binary, ObjectId
 from pymongo import MongoClient
 
-try:
-    from backend import config
-except ImportError:
-    import config
+import config
 
 
 _client: MongoClient | None = None
