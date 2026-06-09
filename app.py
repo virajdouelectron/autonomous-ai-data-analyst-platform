@@ -1,4 +1,3 @@
-import importlib
 import os
 
 import streamlit as st
@@ -13,9 +12,6 @@ st.set_page_config(
 )
 
 st.title("Autonomous AI Data Analyst Platform")
-st.markdown(
-    "Use the sidebar to navigate between the Streamlit frontend pages that interact with the backend API."
-)
 
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
 
@@ -37,7 +33,6 @@ PAGE_MODULES = {
 
 module_name = PAGE_MODULES.get(page)
 try:
-    page_module = importlib.import_module(module_name)
-    importlib.reload(page_module)
+    __import__(module_name)
 except Exception as exc:
     st.error(f"Unable to load page '{page}': {exc}")

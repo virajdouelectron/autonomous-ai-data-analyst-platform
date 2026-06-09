@@ -103,15 +103,6 @@ def render_result(output):
 
 
 st.title("Natural Language Data Query")
-st.markdown(
-    "Ask questions about your uploaded dataset in plain English, and receive generated pandas code plus a rendered result table or chart."
-)
-
-with st.sidebar:
-    st.header("Data query workflow")
-    st.write("1. Upload a CSV dataset")
-    st.write("2. Ask a question using the chat input")
-    st.write("3. View the generated pandas code and result")
 
 uploaded_file = st.file_uploader(
     "Upload CSV",
@@ -167,4 +158,4 @@ if st.session_state.uploaded_df is not None:
     if st.session_state.query_result is not None:
         render_result(st.session_state.query_result)
 else:
-    st.info("Upload a CSV file to begin asking questions using the chat interface.")
+    pass

@@ -7,9 +7,6 @@ import streamlit as st
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
 
 st.title("Autonomous AI Data Analyst Platform")
-st.markdown(
-    "Upload a CSV dataset to preview the contents, inspect schema information, and get a quick overview of your data."
-)
 
 uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"], help="Select a local CSV dataset to preview")
 
@@ -200,4 +197,4 @@ if uploaded_file is not None:
     except Exception as exc:
         st.error(f"Unable to read CSV file: {exc}")
 else:
-    st.info("Use the uploader above to add a CSV file and preview your dataset.")
+    pass

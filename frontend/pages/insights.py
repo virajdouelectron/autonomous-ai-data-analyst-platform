@@ -5,9 +5,6 @@ import streamlit as st
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
 
 st.title("AI Insights")
-st.markdown(
-    "Use the backend `/api/insights` endpoint to generate business insights from data statistics."
-)
 
 insight_prompt = st.text_area("Insight prompt", "Provide a brief description of the dataset and ask the backend for key insights.")
 

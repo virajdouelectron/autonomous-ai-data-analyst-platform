@@ -19,16 +19,6 @@ def load_csv(file) -> pd.DataFrame:
 
 
 st.title("AutoML Model Training")
-st.markdown(
-    "Upload a dataset or provide a stored dataset ID, choose the target column, and train AutoML models using the backend."
-)
-
-with st.sidebar:
-    st.header("Training workflow")
-    st.write("1. Upload a CSV dataset to preview the columns")
-    st.write("2. Select the target column from the dataset")
-    st.write("3. Enter the backend dataset ID")
-    st.write("4. Click Train to run AutoML on the backend")
 
 uploaded_file = st.file_uploader(
     "Upload CSV",
@@ -52,7 +42,7 @@ if uploaded_file is not None:
         st.error(f"Failed to read uploaded file: {exc}")
         target_column = None
 else:
-    st.info("Upload a CSV file to preview available columns and select the target.")
+    pass
     target_column = None
 
 if st.button("Train AutoML Model"):
