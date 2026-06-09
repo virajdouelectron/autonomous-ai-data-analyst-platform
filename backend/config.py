@@ -7,8 +7,12 @@ example, injected as Hugging Face Spaces secrets at runtime).
 """
 
 # Secrets / connection strings (read from environment / secrets manager)
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 MONGO_URI = os.getenv("MONGO_URI")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+
+if not MONGO_URI:
+	print("⚠️ WARNING: MONGO_URI not set. Database features will be disabled.")
+	MONGO_URI = None
 
 
 # Runtime configuration
@@ -16,22 +20,3 @@ BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
 
 # Optional: allow toggling debug or other flags via env
 DEBUG = os.getenv("DEBUG", "false").lower() in ("1", "true", "yes")
-
-
-def validate_required_config():
-	missing = []
-	if not GEMINI_API_KEY:
-		missing.append("GEMINI_API_KEY")
-	if not MONGO_URI:
-		missing.append("MONGO_URI")
-	if missing:
-		raise RuntimeError(
-			"Missing required environment variables: {}. "
-			"Set them in your environment or secrets manager before starting.".format(
-				", ".join(missing)
-			)
-		)
-
-
-# Validate presence at import/startup time to fail fast in CI/runtime
-validate_required_config()
