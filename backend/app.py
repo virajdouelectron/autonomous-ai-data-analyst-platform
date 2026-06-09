@@ -3,6 +3,7 @@ from typing import Dict
 import numpy as np
 import pandas as pd
 from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 
 from routes.insight import router as insight_router
 from routes.query import router as query_router
@@ -12,6 +13,14 @@ from utils.json_utils import clean_dataframe_nan
 app = FastAPI(
     title="Autonomous AI Data Analyst Platform Backend",
     description="Backend for generating business insights, data query and AutoML workflows.",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(insight_router, prefix="/api")
