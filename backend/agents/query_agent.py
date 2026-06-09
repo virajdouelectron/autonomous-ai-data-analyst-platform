@@ -92,6 +92,18 @@ def serialize_query_output(value: Any) -> Any:
         return None
 
 
+def generate_pandas_code(question: str, schema: dict[str, str]) -> dict:
+    schema_text = "\n".join([f"{column}: {data_type}" for column, data_type in schema.items()])
+    prompt = build_pandas_query_prompt(question, schema_text)
+    response_text = call_gemini_api(prompt)
+    pandas_code = extract_code_from_gemini_response(response_text)
+
+    return {
+        "prompt": prompt,
+        "pandas_code": pandas_code,
+    }
+
+
 def query_dataset(dataset_id: str, question: str) -> dict:
     df = get_dataset(dataset_id)
     schema_text = build_column_schema_string(df)
