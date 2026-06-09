@@ -27,8 +27,6 @@ with st.sidebar:
         index=0,
     )
     st.markdown("---")
-    st.write("Backend URL:")
-    st.caption(BACKEND_URL)
 
 PAGE_MODULES = {
     "Home": "frontend.pages.home",
