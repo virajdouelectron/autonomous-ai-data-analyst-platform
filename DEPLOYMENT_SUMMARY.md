@@ -70,7 +70,7 @@ Autonomous-AI-Data-Analyst-Platform/
 
 3. ✨ .env.example (ROOT LEVEL - NEW)
    - Template for environment configuration
-   - Shows all required variables (MONGO_URI, GEMINI_API_KEY, BACKEND_URL)
+   - Shows all required variables (SUPABASE_URL, SUPABASE_ANON_KEY, GEMINI_API_KEY, BACKEND_URL)
    - Documented defaults for local development
 
 4. ✅ README.md (UPDATED)
@@ -117,7 +117,7 @@ Autonomous-AI-Data-Analyst-Platform/
 
 ✅ Environment Variable Configuration
    - BACKEND_URL read from environment (fallback: http://localhost:8000)
-   - MONGO_URI and GEMINI_API_KEY via environment/secrets
+   - SUPABASE_URL, SUPABASE_ANON_KEY, and GEMINI_API_KEY via environment/secrets
    - All configuration externalized - no hardcoded URLs
 
 ✅ NaN/Inf JSON Serialization
@@ -212,7 +212,8 @@ Step 1: Create HuggingFace Space
 Step 2: Add Secrets
    In Space Settings > Secrets, add:
    
-   MONGO_URI=mongodb+srv://your_user:your_password@cluster.mongodb.net/db_name
+   SUPABASE_URL=https://your-project.supabase.co
+   SUPABASE_ANON_KEY=your_supabase_anon_key
    GEMINI_API_KEY=your_gemini_api_key_here
    BACKEND_URL=http://localhost:8000
    
@@ -249,10 +250,14 @@ Step 5: Access Your Space
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 REQUIRED (HuggingFace Spaces Secrets):
-   MONGO_URI
-      MongoDB Atlas connection string
-      Format: mongodb+srv://user:password@cluster.mongodb.net/database_name
-      Get from: MongoDB Atlas > Connect > Python
+   SUPABASE_URL
+      Supabase project URL
+      Format: https://your-project.supabase.co
+      Get from: Supabase Dashboard > Project Settings > API
+
+   SUPABASE_ANON_KEY
+      Supabase anon public key
+      Get from: Supabase Dashboard > Project Settings > API
 
    GEMINI_API_KEY
       Google Gemini API key for AI-powered insights
@@ -278,7 +283,7 @@ OPTIONAL:
 │  ┌─────────────────────────────────────────────────────────┐   │
 │  │ Startup Script (startup.sh)                             │   │
 │  │ • Loads environment variables                           │   │
-│  │ • Validates MONGO_URI and GEMINI_API_KEY               │   │
+│  │ • Validates SUPABASE_URL, SUPABASE_ANON_KEY, and GEMINI_API_KEY │   │
 │  │ • Sets BACKEND_URL fallback                             │   │
 │  └─────────────────────────────────────────────────────────┘   │
 │         ↓                                  ↓                     │
@@ -296,7 +301,7 @@ OPTIONAL:
 │         ↓                                 ↓                      │
 │  ┌──────────────────────────────────────────────────────┐       │
 │  │ Shared Resources                                     │       │
-│  │ • MongoDB Atlas (MONGO_URI)                         │       │
+│  │ • Supabase (SUPABASE_URL, SUPABASE_ANON_KEY)        │       │
 │  │ • Gemini API (GEMINI_API_KEY)                       │       │
 │  │ • json_utils for NaN handling                       │       │
 │  └──────────────────────────────────────────────────────┘       │
@@ -318,7 +323,7 @@ OPTIONAL:
    ✓ In HF Spaces: Ensure BACKEND_URL=http://localhost:8000
 
 ❌ Error: "Missing required environment variables"
-   ✓ Check: MONGO_URI and GEMINI_API_KEY are set in secrets
+   ✓ Check: SUPABASE_URL, SUPABASE_ANON_KEY, and GEMINI_API_KEY are set in secrets
    ✓ For local: Check .env file is created and sourced
 
 ❌ Error: "Docker build fails"
@@ -399,7 +404,7 @@ Your project is now ready to:
 
 Next Steps:
 1. Create HuggingFace Space with Docker SDK
-2. Add secrets (MONGO_URI, GEMINI_API_KEY, BACKEND_URL)
+2. Add secrets (SUPABASE_URL, SUPABASE_ANON_KEY, GEMINI_API_KEY, BACKEND_URL)
 3. Push code to Space: git push hf main
 4. Wait for Docker build (5-10 minutes)
 5. Share Space link with team!

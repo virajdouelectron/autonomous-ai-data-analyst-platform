@@ -19,8 +19,8 @@ fi
 
 # Validate required environment variables
 echo "✓ Checking configuration..."
-if [ -z "$MONGO_URI" ]; then
-    echo "⚠️  WARNING: MONGO_URI not set. Database operations will fail."
+if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+    echo "⚠️  WARNING: SUPABASE_URL or SUPABASE_ANON_KEY not set. Database operations will fail."
 fi
 
 if [ -z "$GEMINI_API_KEY" ]; then

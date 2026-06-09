@@ -73,8 +73,8 @@ fi
 
 # Validate required environment variables
 echo "✓ Checking configuration..."
-if [ -z "$MONGO_URI" ]; then
-    echo "⚠️  WARNING: MONGO_URI not set. Database operations will fail."
+if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+    echo "⚠️  WARNING: SUPABASE_URL or SUPABASE_ANON_KEY not set. Database operations will fail."
 fi
 
 if [ -z "$GEMINI_API_KEY" ]; then
@@ -139,8 +139,9 @@ trap "kill $FASTAPI_PID 2>/dev/null || true" EXIT
 # Copy this file to .env and fill in your actual values for local development
 # For HuggingFace Spaces, set these in the Space Settings > Secrets
 
-# MongoDB connection string for data persistence
-MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/database_name
+# Supabase project URL and anon key for data persistence
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your_supabase_anon_key
 
 # Google Gemini API Key for AI-powered insights
 GEMINI_API_KEY=your_gemini_api_key_here
@@ -390,7 +391,7 @@ def train_model(request: TrainRequest):
 
 ✅ **backend/config.py**
 - Already reads `BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")`
-- Already reads `GEMINI_API_KEY` and `MONGO_URI` from environment
+- Already reads `GEMINI_API_KEY`, `SUPABASE_URL`, and `SUPABASE_ANON_KEY` from environment
 - No changes required
 
 ✅ **root app.py**

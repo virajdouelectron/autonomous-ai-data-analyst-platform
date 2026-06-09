@@ -33,8 +33,8 @@ git push --force
 EOF
 
 echo
-echo "After purging history: rotate any exposed credentials immediately (Gemini API key, MongoDB user password)."
-echo "Also add the new credentials to your GitHub repository Secrets (Settings → Secrets) as GEMINI_API_KEY and MONGO_URI."
+echo "After purging history: rotate any exposed credentials immediately (Gemini API key, Supabase anon key)."
+echo "Also add the new credentials to your GitHub repository Secrets (Settings → Secrets) as GEMINI_API_KEY, SUPABASE_URL, and SUPABASE_ANON_KEY."
 
 echo
 echo "Script finished. Review the steps above and run them manually after taking a backup."
