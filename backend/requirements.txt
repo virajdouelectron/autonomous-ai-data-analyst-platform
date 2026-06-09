@@ -1,8 +1,9 @@
 # Python dependencies for the FastAPI backend.
-# Add FastAPI, uvicorn, pymongo, scikit-learn, and any AI / storage libraries here.
+# Add FastAPI, uvicorn, scikit-learn, and any AI / storage libraries here.
 fastapi
 uvicorn
-pymongo
+supabase
+psycopg2-binary
 scikit-learn
 requests
 pandas
