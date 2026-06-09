@@ -1,4 +1,5 @@
 import os
+import requests
 
 import streamlit as st
 from dotenv import load_dotenv
@@ -13,7 +14,7 @@ st.set_page_config(
 
 st.title("Autonomous AI Data Analyst Platform")
 
-BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
+BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:8000")
 
 with st.sidebar:
     st.header("Navigation")
