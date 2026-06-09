@@ -30,7 +30,12 @@ with st.sidebar:
     st.write("3. Enter the backend dataset ID")
     st.write("4. Click Train to run AutoML on the backend")
 
-uploaded_file = st.file_uploader("Upload a CSV dataset", type=["csv"], help="Upload a CSV to preview columns and select the target variable.")
+uploaded_file = st.file_uploader(
+    "Upload CSV",
+    type=["csv"],
+    key="modeling_uploader",
+    help="Upload a CSV to preview columns and select the target variable.",
+)
 dataset_id = st.text_input("Backend Dataset ID", help="Use the dataset ID stored in MongoDB for training.")
 
 df = None
