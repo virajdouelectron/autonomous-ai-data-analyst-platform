@@ -107,7 +107,7 @@ st.title("Natural Language Data Query")
 uploaded_file = st.file_uploader(
     "Upload CSV",
     type=["csv"],
-    key="query_uploader_1",
+    key="query_uploader",
     help="Select a local CSV dataset for natural language querying.",
 )
 
