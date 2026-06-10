@@ -26,7 +26,20 @@ def build_schema(df: pd.DataFrame) -> dict:
 
 
 def is_safe_query_code(code: str) -> bool:
-    blocked_tokens = ["import ", "open(", "os.", "sys.", "subprocess", "__import__", "eval(", "exec(", "requests", "socket", "shlex", "pathlib"]
+    blocked_tokens = [
+        "import ",
+        "open(",
+        "os.",
+        "sys.",
+        "subprocess",
+        "__import__",
+        "eval(",
+        "exec(",
+        "requests",
+        "socket",
+        "shlex",
+        "pathlib",
+    ]
     normalized = code.replace("\n", " ").lower()
     return not any(token in normalized for token in blocked_tokens)
 
@@ -114,7 +127,9 @@ uploaded_file = st.file_uploader(
 if uploaded_file is not None:
     try:
         st.session_state.uploaded_df = load_csv(uploaded_file)
-        st.success(f"Loaded dataset with {st.session_state.uploaded_df.shape[0]} rows and {st.session_state.uploaded_df.shape[1]} columns.")
+        st.success(
+            f"Loaded dataset with {st.session_state.uploaded_df.shape[0]} rows and {st.session_state.uploaded_df.shape[1]} columns."
+        )
     except Exception as exc:
         st.error(f"Unable to load CSV file: {exc}")
 
@@ -145,8 +160,11 @@ if st.session_state.uploaded_df is not None:
             else:
                 st.session_state.query_result = output
 
-        except Exception as exc:
+        except requests.exceptions.RequestException as exc:
             st.error(f"Query failed: {exc}")
+            st.session_state.query_result = None
+        except Exception as exc:
+            st.error(f"Unexpected error: {exc}")
             st.session_state.query_result = None
 
     for message in st.session_state.chat_history:
@@ -158,4 +176,4 @@ if st.session_state.uploaded_df is not None:
     if st.session_state.query_result is not None:
         render_result(st.session_state.query_result)
 else:
-    pass
+    st.info("Upload a CSV file to query your dataset.")

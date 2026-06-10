@@ -26,7 +26,11 @@ uploaded_file = st.file_uploader(
     key="modeling_uploader",
     help="Upload a CSV to preview columns and select the target variable.",
 )
-dataset_id = st.text_input("Backend Dataset ID", help="Use the dataset ID stored in MongoDB for training.")
+
+dataset_id = st.text_input(
+    "Backend Dataset ID",
+    help="Use the dataset ID stored in MongoDB for training.",
+)
 
 df = None
 if uploaded_file is not None:
@@ -36,13 +40,11 @@ if uploaded_file is not None:
         with st.expander("Dataset preview"):
             st.dataframe(df.head(10), use_container_width=True)
 
-        st.write("### Select target column")
         target_column = st.selectbox("Target column", options=df.columns.tolist())
     except Exception as exc:
         st.error(f"Failed to read uploaded file: {exc}")
         target_column = None
 else:
-    pass
     target_column = None
 
 if st.button("Train AutoML Model"):
@@ -66,6 +68,14 @@ if st.button("Train AutoML Model"):
                 )
                 response.raise_for_status()
                 st.session_state.train_response = response.json()
+            except requests.exceptions.RequestException as exc:
+                if exc.response is not None:
+                    try:
+                        st.session_state.modeling_error = exc.response.json()
+                    except Exception:
+                        st.session_state.modeling_error = exc.response.text
+                else:
+                    st.session_state.modeling_error = str(exc)
             except Exception as exc:
                 st.session_state.modeling_error = str(exc)
 
@@ -94,7 +104,13 @@ if st.session_state.train_response:
             }
         ).sort_values("importance", ascending=False)
         st.subheader("Feature Importance")
-        fig = px.bar(fi_df, x="importance", y="feature", orientation="h", title="Best Model Feature Importance")
+        fig = px.bar(
+            fi_df,
+            x="importance",
+            y="feature",
+            orientation="h",
+            title="Best Model Feature Importance",
+        )
         st.plotly_chart(fig, use_container_width=True)
     else:
         st.info("No feature importance data was available for the selected model.")
