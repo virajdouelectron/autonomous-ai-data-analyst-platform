@@ -130,7 +130,7 @@ if st.session_state.uploaded_df is not None:
         try:
             response = requests.post(
                 f"{BACKEND_URL}/api/query",
-                json={"question": prompt, "schema": build_schema(df)},
+                json={"question": prompt, "schema_info": build_schema(df)},
                 timeout=60,
             )
             response.raise_for_status()
