@@ -15,7 +15,7 @@ router = APIRouter()
 
 class QueryRequest(BaseModel):
     question: str
-    schema: Dict[str, str]
+    schema_info: dict  # Renamed from 'schema'
 
 
 class QueryResponse(BaseModel):
@@ -68,11 +68,11 @@ def make_result_json_serializable(result: Any) -> list[dict] | dict | int | floa
 @router.post("/query", response_model=QueryResponse)
 def create_query_code(request: QueryRequest):
     """Generate valid pandas code for a user's natural language question."""
-    result = generate_pandas_code(request.question, request.schema)
+    result = generate_pandas_code(request.question, request.schema_info)
     save_query_history(
         question=request.question,
         pandas_code=result["pandas_code"],
-        schema=request.schema,
+        schema=request.schema_info,
     )
     return QueryResponse(**result)
 
