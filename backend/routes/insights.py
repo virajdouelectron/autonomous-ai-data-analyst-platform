@@ -11,7 +11,7 @@ logger = setup_logging(__name__)
 router = APIRouter()
 
 if config.GEMINI_API_KEY:
-    genai.configure(api_key=config.your-AIzaSyB5gT_CxP_Un3t1Cfh36pnYRM6oOvgtOac)
+    genai.configure(api_key=config.GEMINI_API_KEY)
 
 class InsightRequest(BaseModel):
     data_summary: str
