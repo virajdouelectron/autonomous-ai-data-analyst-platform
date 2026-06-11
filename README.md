@@ -1,3 +1,15 @@
+---
+title: Autonomous AI Data Analyst
+emoji: 📊
+colorFrom: blue
+colorTo: purple
+sdk: streamlit
+sdk_version: "1.28.0"
+python_version: "3.12"
+app_file: app.py
+pinned: false
+---
+
 # 📊 Autonomous AI Data Analyst
 
 Production-ready AI-powered data analysis platform with a Perplexity-like chat interface.
