@@ -10,7 +10,7 @@ from app import app
 @pytest.fixture
 def client():
     """FastAPI test client."""
-    return TestClient(app)
+    return TestClient(app=app)
 
 @pytest.fixture
 def sample_csv_content():
