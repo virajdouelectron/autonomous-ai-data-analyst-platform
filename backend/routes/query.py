@@ -1,19 +1,29 @@
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
-from typing import List
-import google.generativeai as genai
-import logging
+import sys
+import traceback
 
+print("Loading routes.query...", file=sys.stderr)
 try:
-    from logging_config import setup_logging
-except ImportError:
+    from fastapi import APIRouter, HTTPException
+    from pydantic import BaseModel
+    from typing import List
+    import google.generativeai as genai
     import logging
-    logging.basicConfig(level=logging.INFO)
-    setup_logging = logging.getLogger
-import config
-
-logger = setup_logging(__name__)
-router = APIRouter()
+    
+    try:
+        from logging_config import setup_logging
+    except ImportError:
+        import logging as fallback_logging
+        setup_logging = lambda x: fallback_logging.getLogger(x)
+    import config
+    
+    logger = setup_logging(__name__)
+    router = APIRouter()
+    print("✅ routes.query loaded successfully", file=sys.stderr)
+    
+except Exception as e:
+    print(f"❌ Failed to load routes.query: {str(e)}", file=sys.stderr)
+    print(traceback.format_exc(), file=sys.stderr)
+    raise
 
 if config.GEMINI_API_KEY:
     genai.configure(api_key=config.GEMINI_API_KEY)

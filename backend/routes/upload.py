@@ -1,20 +1,30 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
-from pydantic import BaseModel
-from typing import List, Dict, Any
-import pandas as pd
-import numpy as np
-from io import StringIO
-import logging
+import sys
+import traceback
 
+print("Loading routes.upload...", file=sys.stderr)
 try:
-    from logging_config import setup_logging
-except ImportError:
+    from fastapi import APIRouter, UploadFile, File, HTTPException
+    from pydantic import BaseModel
+    from typing import List, Dict, Any
+    import pandas as pd
+    import numpy as np
+    from io import StringIO
     import logging
-    logging.basicConfig(level=logging.INFO)
-    setup_logging = logging.getLogger
-
-logger = setup_logging(__name__)
-router = APIRouter()
+    
+    try:
+        from logging_config import setup_logging
+    except ImportError:
+        import logging as fallback_logging
+        setup_logging = lambda x: fallback_logging.getLogger(x)
+    
+    logger = setup_logging(__name__)
+    router = APIRouter()
+    print("✅ routes.upload loaded successfully", file=sys.stderr)
+    
+except Exception as e:
+    print(f"❌ Failed to load routes.upload: {str(e)}", file=sys.stderr)
+    print(traceback.format_exc(), file=sys.stderr)
+    raise
 
 class UploadResponse(BaseModel):
     status: str
