@@ -1,32 +1,26 @@
-import sys
-import traceback
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
+from typing import List
+import logging
 
-print("Loading routes.query...", file=sys.stderr)
 try:
-    from fastapi import APIRouter, HTTPException
-    from pydantic import BaseModel
-    from typing import List
-    import google.generativeai as genai
-    import logging
-    
-    try:
-        from logging_config import setup_logging
-    except ImportError:
-        import logging as fallback_logging
-        setup_logging = lambda x: fallback_logging.getLogger(x)
-    import config
-    
-    logger = setup_logging(__name__)
-    router = APIRouter()
-    print("✅ routes.query loaded successfully", file=sys.stderr)
-    
-except Exception as e:
-    print(f"❌ Failed to load routes.query: {str(e)}", file=sys.stderr)
-    print(traceback.format_exc(), file=sys.stderr)
-    raise
+    from logging_config import setup_logging
+except ImportError:
+    import logging as fallback_logging
+    setup_logging = lambda x: fallback_logging.getLogger(x)
+import config
 
-if config.GEMINI_API_KEY:
-    genai.configure(api_key=config.GEMINI_API_KEY)
+logger = setup_logging(__name__)
+router = APIRouter()
+
+genai = None
+try:
+    import google.generativeai as _genai
+    genai = _genai
+    if config.GEMINI_API_KEY:
+        genai.configure(api_key=config.GEMINI_API_KEY)
+except ImportError:
+    logger.warning("google-generativeai not installed, AI features disabled")
 
 class QueryRequest(BaseModel):
     question: str
@@ -48,11 +42,11 @@ async def generate_query(request: QueryRequest) -> QueryResponse:
         QueryResponse with generated pandas code
     """
     try:
-        if not config.GEMINI_API_KEY:
-            logger.warning("Gemini API key not configured")
+        if not config.GEMINI_API_KEY or genai is None:
+            logger.warning("Gemini API key not configured or package not installed")
             return QueryResponse(
                 status="warning",
-                code="# Gemini API not configured"
+                code="# Gemini API not configured. Please set GEMINI_API_KEY."
             )
         
         logger.info(f"Generating query for: {request.question[:50]}...")
