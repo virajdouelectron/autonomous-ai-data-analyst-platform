@@ -4,7 +4,12 @@ from typing import Optional
 import google.generativeai as genai
 import logging
 
-from logging_config import setup_logging
+try:
+    from logging_config import setup_logging
+except ImportError:
+    import logging
+    logging.basicConfig(level=logging.INFO)
+    setup_logging = logging.getLogger
 import config
 
 logger = setup_logging(__name__)
