@@ -1,38 +1,42 @@
 #!/bin/bash
 set -e
-set -x  # Print each command
 
 echo "===== Starting Autonomous AI Data Analyst ====="
 echo "🚀 Starting FastAPI backend..."
 
 cd /app/backend
 
-# Start backend with explicit error handling
-uvicorn app:app --host 0.0.0.0 --port 8000 --log-level info 2>&1 | tee backend.log &
+# Start backend and capture output
+tmux_pipe="/tmp/backend.log"
+uvicorn app:app \
+    --host 0.0.0.0 \
+    --port 8000 \
+    --log-level info \
+    2>&1 | tee /tmp/backend.log &
+
 BACKEND_PID=$!
-
 echo "Backend PID: $BACKEND_PID"
-echo "⏳ Waiting for backend to be ready..."
 
-# Wait up to 60 seconds for backend
+echo "⏳ Waiting for backend..."
 for i in {1..60}; do
-    echo "Attempt $i/60..."
-    if python -c "import requests; r = requests.get('http://localhost:8000/health', timeout=2); print('Backend OK'); r.raise_for_status()" 2>/dev/null; then
-        echo "✅ Backend is ready!"
-        break
-    fi
-    if ! kill -0 $BACKEND_PID 2>/dev/null; then
-        echo "❌ Backend process died. Showing logs:"
-        cat backend.log
+    if kill -0 $BACKEND_PID 2>/dev/null; then
+        if python -c "import requests; requests.get('http://localhost:8000/health', timeout=2)" 2>/dev/null; then
+            echo "✅ Backend is ready!"
+            break
+        fi
+    else
+        echo "❌ Backend process died!"
+        echo "Backend logs:"
+        cat /tmp/backend.log
         exit 1
     fi
+    echo "  Attempt $i/60..."
     sleep 1
 done
 
-echo "🎨 Starting Streamlit frontend..."
+echo "🎨 Starting Streamlit..."
 cd /app
-streamlit run app.py \
+exec streamlit run app.py \
     --server.port 7860 \
     --server.address 0.0.0.0 \
-    --server.headless true \
-    --logger.level=info
+    --server.headless true
