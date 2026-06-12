@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+set -x  # Print each command
 
 echo "===== Starting Autonomous AI Data Analyst ====="
 echo "🚀 Starting FastAPI backend..."
