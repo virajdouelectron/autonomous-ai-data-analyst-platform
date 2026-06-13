@@ -28,6 +28,7 @@ def start_backend():
         pass
     
     # Start silently without st.write() messages
+    env = os.environ.copy()
     backend_process = subprocess.Popen(
         ["python", "-m", "uvicorn", "app:app", 
          "--host", "0.0.0.0", 
@@ -36,7 +37,8 @@ def start_backend():
         cwd="/app/backend",
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        text=True
+        text=True,
+        env=env
     )
     
     # Wait quietly
@@ -587,7 +589,24 @@ else:
             st.error(f"Error: {str(e)}")
     
     if st.session_state.dataset:
-        st.markdown("<br>### 💬 Conversation with Your Data", unsafe_allow_html=True)
+        st.markdown("### 📊 Data Visualization")
+        preview_df = pd.DataFrame(st.session_state.dataset['data'])
+        numeric_cols = preview_df.select_dtypes(include=['number']).columns.tolist()
+        
+        if numeric_cols:
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                selected_col = st.selectbox("Column:", numeric_cols, key="viz_col")
+                st.bar_chart(preview_df[selected_col], use_container_width=True)
+            
+            with col2:
+                st.markdown("**Statistics**")
+                stats = preview_df[numeric_cols].describe()
+                st.dataframe(stats, use_container_width=True)
+        
+        st.divider()
+        st.markdown("### 💬 Chat with Your Data")
         
         # Display chat history
         for msg in st.session_state.chat_history:
