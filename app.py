@@ -27,8 +27,7 @@ def start_backend():
     except:
         pass
     
-    st.write("🚀 Starting backend...")
-    
+    # Start silently without st.write() messages
     backend_process = subprocess.Popen(
         ["python", "-m", "uvicorn", "app:app", 
          "--host", "0.0.0.0", 
@@ -40,19 +39,15 @@ def start_backend():
         text=True
     )
     
-    st.write("⏳ Waiting for backend...")
+    # Wait quietly
     for i in range(60):
         try:
             response = requests.get("http://localhost:8000/health", timeout=2)
             if response.status_code == 200:
-                st.write("✅ Backend ready!")
                 return True
         except:
-            if i % 10 == 0:
-                st.write(f"  Attempt {i+1}/60...")
             time.sleep(1)
     
-    st.error("❌ Backend failed")
     return False
 
 # Start backend
