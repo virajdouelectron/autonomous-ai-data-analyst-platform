@@ -1,14 +1,66 @@
 import streamlit as st
 import requests
 import os
+import sys
+import subprocess
+import time
 import pandas as pd
 from datetime import datetime
 import logging
+import threading
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:8000")
+
+
+@st.cache_resource
+def start_backend():
+    """Start FastAPI backend as subprocess (runs once per Streamlit session)."""
+    try:
+        requests.get(f"{BACKEND_URL}/health", timeout=1)
+        logger.info("Backend already running")
+        return True
+    except Exception:
+        pass
+
+    logger.info("Starting FastAPI backend...")
+    backend_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "backend")
+
+    process = subprocess.Popen(
+        [sys.executable, "-m", "uvicorn", "app:app",
+         "--host", "0.0.0.0", "--port", "8000", "--log-level", "info"],
+        cwd=backend_dir,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        bufsize=1,
+    )
+
+    def log_output():
+        for line in process.stdout:
+            logger.info(f"[BACKEND] {line.rstrip()}")
+
+    threading.Thread(target=log_output, daemon=True).start()
+
+    for i in range(60):
+        try:
+            resp = requests.get(f"{BACKEND_URL}/health", timeout=2)
+            if resp.status_code == 200:
+                logger.info("Backend started successfully")
+                return True
+        except Exception:
+            pass
+        if i % 10 == 0:
+            logger.info(f"Waiting for backend... attempt {i+1}/60")
+        time.sleep(1)
+
+    logger.error("Backend failed to start after 60 seconds")
+    return False
+
+
+backend_ready = start_backend()
 
 st.set_page_config(
     page_title="Autonomous AI Data Analyst",
@@ -486,6 +538,10 @@ if st.session_state.current_page == "landing":
 
 # APP PAGE
 else:
+    if not backend_ready:
+        st.error("Backend is not ready. Please refresh the page.")
+        st.stop()
+
     st.markdown("### 📤 Upload Your Dataset")
     
     uploaded_file = st.file_uploader(
