@@ -16,7 +16,6 @@ import os
 import requests
 import pandas as pd
 from datetime import datetime
-import logging
 import threading
 
 @st.cache_resource
@@ -550,8 +549,6 @@ else:
     if uploaded_file:
         try:
             with st.spinner("📤 Processing and parsing your file..."):
-                logger.info(f"Uploading file to backend: {uploaded_file.name}")
-                
                 files = {
                     "file": (uploaded_file.name, uploaded_file.getvalue(), "text/csv")
                 }
