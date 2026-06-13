@@ -27,7 +27,16 @@ def start_backend():
     except:
         pass
     
-    # Start silently without st.write() messages
+    # DEBUG: Show what env vars are available
+    st.write("🔍 Checking environment variables...")
+    gemini_key = os.environ.get("GEMINI_API_KEY")
+    if gemini_key:
+        st.success(f"✅ GEMINI_API_KEY found: {gemini_key[:10]}...")
+    else:
+        st.warning("⚠️ GEMINI_API_KEY not found in environment")
+        st.write("Available env vars:", list(os.environ.keys()))
+    
+    # Pass env to backend
     env = os.environ.copy()
     backend_process = subprocess.Popen(
         ["python", "-m", "uvicorn", "app:app", 
@@ -41,7 +50,6 @@ def start_backend():
         env=env
     )
     
-    # Wait quietly
     for i in range(60):
         try:
             response = requests.get("http://localhost:8000/health", timeout=2)
