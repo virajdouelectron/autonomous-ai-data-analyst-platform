@@ -1,73 +1,69 @@
 import streamlit as st
-import requests
-import os
-import sys
+
+# MUST BE FIRST - before any other st commands
+st.set_page_config(
+    page_title="AI Data Analyst",
+    page_icon="📊",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
+# NOW start backend
 import subprocess
 import time
+import sys
+import os
+import requests
 import pandas as pd
 from datetime import datetime
 import logging
 import threading
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:8000")
-
-
 @st.cache_resource
 def start_backend():
-    """Start FastAPI backend as subprocess (runs once per Streamlit session)."""
+    """Start FastAPI backend as subprocess (only once)."""
     try:
-        requests.get(f"{BACKEND_URL}/health", timeout=1)
-        logger.info("Backend already running")
+        requests.get("http://localhost:8000/health", timeout=1)
         return True
-    except Exception:
+    except:
         pass
-
-    logger.info("Starting FastAPI backend...")
-    backend_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "backend")
-
-    process = subprocess.Popen(
-        [sys.executable, "-m", "uvicorn", "app:app",
-         "--host", "0.0.0.0", "--port", "8000", "--log-level", "info"],
-        cwd=backend_dir,
+    
+    st.write("🚀 Starting backend...")
+    
+    backend_process = subprocess.Popen(
+        ["python", "-m", "uvicorn", "app:app", 
+         "--host", "0.0.0.0", 
+         "--port", "8000", 
+         "--log-level", "info"],
+        cwd="/app/backend",
         stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        text=True,
-        bufsize=1,
+        stderr=subprocess.PIPE,
+        text=True
     )
-
-    def log_output():
-        for line in process.stdout:
-            logger.info(f"[BACKEND] {line.rstrip()}")
-
-    threading.Thread(target=log_output, daemon=True).start()
-
+    
+    st.write("⏳ Waiting for backend...")
     for i in range(60):
         try:
-            resp = requests.get(f"{BACKEND_URL}/health", timeout=2)
-            if resp.status_code == 200:
-                logger.info("Backend started successfully")
+            response = requests.get("http://localhost:8000/health", timeout=2)
+            if response.status_code == 200:
+                st.write("✅ Backend ready!")
                 return True
-        except Exception:
-            pass
-        if i % 10 == 0:
-            logger.info(f"Waiting for backend... attempt {i+1}/60")
-        time.sleep(1)
-
-    logger.error("Backend failed to start after 60 seconds")
+        except:
+            if i % 10 == 0:
+                st.write(f"  Attempt {i+1}/60...")
+            time.sleep(1)
+    
+    st.error("❌ Backend failed")
     return False
 
-
+# Start backend
+BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:8000")
 backend_ready = start_backend()
 
-st.set_page_config(
-    page_title="Autonomous AI Data Analyst",
-    page_icon="📊",
-    layout="wide",
-    initial_sidebar_state="collapsed"
-)
+# ADD ALL THE REST OF YOUR CODE HERE
+# CSS, session state, landing page, app page, etc.
+
+# ... rest stays the same
 
 # Professional Blue/Teal/White Landing Page CSS
 st.markdown("""
