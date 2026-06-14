@@ -1,7 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List
-import os
 import logging
 
 try:
@@ -9,12 +8,15 @@ try:
 except ImportError:
     import logging as fallback_logging
     setup_logging = lambda x: fallback_logging.getLogger(x)
+import config
 
 logger = setup_logging(__name__)
 router = APIRouter()
 
 try:
     import google.generativeai as genai
+    if config.GEMINI_API_KEY:
+        genai.configure(api_key=config.GEMINI_API_KEY)
 except ImportError:
     genai = None
     logger.warning("google-generativeai not installed, AI features disabled")
@@ -39,15 +41,13 @@ async def generate_query(request: QueryRequest) -> QueryResponse:
         QueryResponse with generated pandas code
     """
     try:
-        api_key = os.environ.get("GEMINI_API_KEY")
-        if not api_key or genai is None:
+        if not config.GEMINI_API_KEY or genai is None:
             logger.warning("Gemini API key not configured or package not installed")
             return QueryResponse(
                 status="warning",
                 code="# Gemini API not configured. Please set GEMINI_API_KEY."
             )
 
-        genai.configure(api_key=api_key)
         logger.info(f"Generating query for: {request.question[:50]}...")
 
         model = genai.GenerativeModel('gemini-pro')

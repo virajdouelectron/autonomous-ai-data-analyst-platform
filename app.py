@@ -18,46 +18,57 @@ import pandas as pd
 from datetime import datetime
 import threading
 
+def _write_backend_env():
+    """Write environment variables to backend .env so the subprocess can read them."""
+    env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "backend", ".env")
+    api_key = os.environ.get("GEMINI_API_KEY", "")
+    if api_key:
+        with open(env_path, "w") as f:
+            f.write(f"GEMINI_API_KEY={api_key}\n")
+
+
 @st.cache_resource
 def start_backend():
     """Start FastAPI backend as subprocess (only once)."""
     try:
         requests.get("http://localhost:8000/health", timeout=1)
         return True
-    except:
+    except Exception:
         pass
-    
-    # DEBUG: Show what env vars are available
-    st.write("🔍 Checking environment variables...")
-    gemini_key = os.environ.get("GEMINI_API_KEY")
-    if gemini_key:
-        st.success(f"✅ GEMINI_API_KEY found: {gemini_key[:10]}...")
-    else:
-        st.warning("⚠️ GEMINI_API_KEY not found in environment")
-        st.write("Available env vars:", list(os.environ.keys()))
-    
-    # Pass env to backend
-    env = os.environ.copy()
+
+    _write_backend_env()
+
+    backend_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "backend")
     backend_process = subprocess.Popen(
-        ["python", "-m", "uvicorn", "app:app", 
-         "--host", "0.0.0.0", 
-         "--port", "8000", 
+        [sys.executable, "-m", "uvicorn", "app:app",
+         "--host", "0.0.0.0",
+         "--port", "8000",
          "--log-level", "info"],
-        cwd="/app/backend",
+        cwd=backend_dir,
         stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
         text=True,
-        env=env
+        bufsize=1,
     )
-    
+
+    def log_output():
+        for line in backend_process.stdout:
+            print(f"[BACKEND] {line.rstrip()}")
+
+    threading.Thread(target=log_output, daemon=True).start()
+
     for i in range(60):
         try:
-            response = requests.get("http://localhost:8000/health", timeout=2)
-            if response.status_code == 200:
+            resp = requests.get("http://localhost:8000/health", timeout=2)
+            if resp.status_code == 200:
                 return True
-        except:
-            time.sleep(1)
-    
+        except Exception:
+            pass
+        if i % 10 == 0:
+            print(f"Waiting for backend... attempt {i+1}/60")
+        time.sleep(1)
+
+    print("Backend failed to start after 60 seconds")
     return False
 
 # Start backend
