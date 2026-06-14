@@ -15,8 +15,12 @@ import sys
 import os
 import requests
 import pandas as pd
+import numpy as np
 from datetime import datetime
 import threading
+import plotly.express as px
+import plotly.graph_objects as go
+from scipy import stats
 
 def _write_backend_env():
     """Write environment variables to backend .env so the subprocess can read them."""
@@ -608,21 +612,158 @@ else:
             st.error(f"Error: {str(e)}")
     
     if st.session_state.dataset:
-        st.markdown("### 📊 Data Visualization")
+        st.markdown("### 📊 Advanced Data Analysis")
         preview_df = pd.DataFrame(st.session_state.dataset['data'])
         numeric_cols = preview_df.select_dtypes(include=['number']).columns.tolist()
-        
+
         if numeric_cols:
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                selected_col = st.selectbox("Column:", numeric_cols, key="viz_col")
-                st.bar_chart(preview_df[selected_col], use_container_width=True)
-            
-            with col2:
-                st.markdown("**Statistics**")
-                stats = preview_df[numeric_cols].describe()
-                st.dataframe(stats, use_container_width=True)
+            tab1, tab2, tab3, tab4, tab5 = st.tabs([
+                "📈 Distribution",
+                "🔗 Correlation",
+                "📊 Box Plots",
+                "⚡ Time Series",
+                "📉 Statistics"
+            ])
+
+            with tab1:
+                st.subheader("Distribution Analysis")
+                selected_dist = st.selectbox("Column to analyze:", numeric_cols, key="dist_col")
+
+                col1, col2 = st.columns(2)
+
+                with col1:
+                    fig = go.Figure()
+                    fig.add_trace(go.Histogram(
+                        x=preview_df[selected_dist],
+                        nbinsx=30,
+                        name="Histogram",
+                        marker_color='rgba(2, 132, 199, 0.7)'
+                    ))
+                    fig.update_layout(
+                        title=f"Distribution of {selected_dist}",
+                        xaxis_title=selected_dist,
+                        yaxis_title="Frequency",
+                        hovermode='x unified',
+                        template='plotly_dark'
+                    )
+                    st.plotly_chart(fig, use_container_width=True)
+
+                with col2:
+                    fig = go.Figure(data=[go.Box(
+                        y=preview_df[selected_dist],
+                        name=selected_dist,
+                        marker_color='rgba(13, 148, 136, 0.7)'
+                    )])
+                    fig.update_layout(
+                        title=f"Box Plot - {selected_dist}",
+                        template='plotly_dark'
+                    )
+                    st.plotly_chart(fig, use_container_width=True)
+
+                col1, col2, col3, col4, col5 = st.columns(5)
+                with col1:
+                    st.metric("Mean", f"{preview_df[selected_dist].mean():.2f}")
+                with col2:
+                    st.metric("Median", f"{preview_df[selected_dist].median():.2f}")
+                with col3:
+                    st.metric("Std Dev", f"{preview_df[selected_dist].std():.2f}")
+                with col4:
+                    st.metric("Min", f"{preview_df[selected_dist].min():.2f}")
+                with col5:
+                    st.metric("Max", f"{preview_df[selected_dist].max():.2f}")
+
+            with tab2:
+                st.subheader("Correlation Matrix")
+
+                if len(numeric_cols) > 1:
+                    corr_matrix = preview_df[numeric_cols].corr()
+
+                    fig = go.Figure(data=go.Heatmap(
+                        z=corr_matrix.values,
+                        x=corr_matrix.columns,
+                        y=corr_matrix.columns,
+                        colorscale='RdBu',
+                        zmid=0,
+                        text=np.round(corr_matrix.values, 2),
+                        texttemplate='%{text}',
+                        textfont={"size": 10},
+                        colorbar=dict(title="Correlation")
+                    ))
+                    fig.update_layout(
+                        title="Correlation Heatmap",
+                        template='plotly_dark',
+                        height=500
+                    )
+                    st.plotly_chart(fig, use_container_width=True)
+                else:
+                    st.info("Need at least 2 numeric columns for correlation analysis.")
+
+            with tab3:
+                st.subheader("Box Plots - All Numeric Columns")
+
+                fig = go.Figure()
+                for col in numeric_cols:
+                    fig.add_trace(go.Box(
+                        y=preview_df[col],
+                        name=col
+                    ))
+                fig.update_layout(
+                    title="Distribution Comparison",
+                    template='plotly_dark',
+                    height=400
+                )
+                st.plotly_chart(fig, use_container_width=True)
+
+            with tab4:
+                st.subheader("Time Series Analysis")
+
+                date_cols = preview_df.select_dtypes(include=['object']).columns
+
+                if len(date_cols) > 0 and len(numeric_cols) > 0:
+                    date_col = st.selectbox("Date column:", date_cols, key="date_col")
+                    value_col = st.selectbox("Value column:", numeric_cols, key="ts_col")
+
+                    try:
+                        df_ts = preview_df.copy()
+                        df_ts[date_col] = pd.to_datetime(df_ts[date_col])
+                        df_ts = df_ts.sort_values(date_col)
+
+                        fig = go.Figure()
+                        fig.add_trace(go.Scatter(
+                            x=df_ts[date_col],
+                            y=df_ts[value_col],
+                            mode='lines+markers',
+                            name=value_col,
+                            line=dict(color='rgba(2, 132, 199, 0.8)', width=2),
+                            marker=dict(size=6)
+                        ))
+                        fig.update_layout(
+                            title=f"{value_col} Over Time",
+                            xaxis_title=date_col,
+                            yaxis_title=value_col,
+                            template='plotly_dark',
+                            hovermode='x unified'
+                        )
+                        st.plotly_chart(fig, use_container_width=True)
+                    except Exception:
+                        st.error("Could not parse the selected date column. Ensure it contains valid dates.")
+                else:
+                    st.info("Need at least one text (date) column and one numeric column for time series analysis.")
+
+            with tab5:
+                st.subheader("Statistical Summary")
+
+                st.markdown("**Descriptive Statistics**")
+                desc_df = preview_df[numeric_cols].describe().T
+                st.dataframe(desc_df, use_container_width=True)
+
+                st.markdown("**Skewness & Kurtosis**")
+                skew_kurt = pd.DataFrame({
+                    'Column': numeric_cols,
+                    'Skewness': [stats.skew(preview_df[col].dropna()) for col in numeric_cols],
+                    'Kurtosis': [stats.kurtosis(preview_df[col].dropna()) for col in numeric_cols]
+                })
+                st.dataframe(skew_kurt, use_container_width=True)
         
         st.divider()
         st.markdown("### 💬 Chat with Your Data")
